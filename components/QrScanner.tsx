@@ -1,9 +1,10 @@
-import { CameraView, useCameraPermissions } from "expo-camera";
-import { Dispatch, SetStateAction, useState } from "react";
-import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { CameraView, Camera } from "expo-camera";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import { RoundButton } from "@/components/RoundButton";
-import { MaterialIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
+import { AfterScanView } from "@/components/AfterScanView";
 
 interface Props {
   setWasExitCameraPressed: Dispatch<SetStateAction<boolean>>;
@@ -11,60 +12,81 @@ interface Props {
 
 export default function QrScanner({ setWasExitCameraPressed }: Props) {
   console.log("Entering QrScanner");
-  const [permission, requestPermission] = useCameraPermissions();
+  const [hasPermission, setHasPermission] = useState<any>(null);
+  const [scanned, setScanned] = useState(false);
+  const [uri, setUri] = useState({ uri: "" });
 
-  if (!permission) {
-    // Camera permissions are still loading.
-    return <View />;
+  useEffect(() => {
+    const getCameraPermissions = async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setHasPermission(status === "granted");
+    };
+
+    getCameraPermissions();
+  }, []);
+
+  const handleBarCodeScanned = ({
+    type,
+    data,
+  }: {
+    type: any;
+    data: string;
+  }) => {
+    setScanned(true);
+    setUri({ uri: data });
+  };
+
+  if (hasPermission === null) {
+    return <Text>Requesting for camera permission</Text>;
   }
-
-  if (!permission.granted) {
-    // Camera permissions are not granted yet.
-    return (
-      <View style={styles.container}>
-        <Text style={{ textAlign: "center" }}>
-          We need your permission to show the camera
-        </Text>
-        <Button onPress={requestPermission} title="grant permission" />
-      </View>
-    );
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
   }
 
   return (
     <View style={styles.container}>
-      <CameraView
-        // onBarcodeScanned={Alert.alert("Bar code scanned")}
-        style={styles.camera}
-        facing="back"
-        barcodeScannerSettings={{
-          barcodeTypes: ["qr"],
-        }}
-      >
-        {/* <View style={styles.buttonContainer}>
-          <RoundButton
-            styling={{ flex: 1, alignSelf: "flex-end", alignItems: "center" }}
-            icon="qrcode"
-            label="Scan QR Code"
-            onPress={toggleCameraFacing}
+      {scanned && uri ? (
+        <>
+          <AfterScanView>
+            <></>
+          </AfterScanView>
+        </>
+      ) : (
+        <>
+          <CameraView
+            style={StyleSheet.absoluteFillObject}
+            facing="back"
+            barcodeScannerSettings={{
+              barcodeTypes: ["qr", "pdf417"],
+            }}
+            onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
           />
-        </View> */}
-        <View style={styles.buttonContainer}>
-          <View
-            style={{ flex: 1, alignSelf: "flex-end", alignItems: "center" }}
-          >
-            <RoundButton
-              label="Exit"
-              styling={{ backgroundColor: "red" }}
-              onPress={() => {
-                setWasExitCameraPressed(true);
-                // setWasQrBtnPressed(false);
-              }}
+          <View style={styles.buttonContainer}>
+            {scanned && (
+              <View
+                style={{ flex: 1, alignSelf: "flex-end", alignItems: "center" }}
+              >
+                <RoundButton label="Exit" onPress={() => setScanned(false)}>
+                  <MaterialIcons name="refresh" size={24} color="black" />
+                </RoundButton>
+              </View>
+            )}
+            <View
+              style={{ flex: 1, alignSelf: "flex-end", alignItems: "center" }}
             >
-              <AntDesign name="close" size={24} color="black" />
-            </RoundButton>
+              <RoundButton
+                label="Exit"
+                styling={{ backgroundColor: "red" }}
+                onPress={() => {
+                  setWasExitCameraPressed(true);
+                }}
+              >
+                <AntDesign name="close" size={24} color="black" />
+              </RoundButton>
+            </View>
           </View>
-        </View>
-      </CameraView>
+        </>
+      )}
     </View>
   );
 }
@@ -98,30 +120,3 @@ const styles = StyleSheet.create({
     margin: 10,
   },
 });
-
-const renderScanner = () => {};
-
-// const styles = StyleSheet.create({
-//   titleContainer: {
-//     flexDirection: "row",
-//     alignItems: "center",
-//     justifyContent: "center",
-//     gap: 8,
-//   },
-//   parentContainer: {
-//     flexDirection: "row",
-//     justifyContent: "center",
-//     alignItems: "center",
-//   },
-//   childContainer: {
-//     gap: 8,
-//     margin: 10,
-//   },
-//   reactLogo: {
-//     height: 178,
-//     width: 290,
-//     bottom: 0,
-//     left: 0,
-//     position: "absolute",
-//   },
-// });
