@@ -1,20 +1,20 @@
-import { AntDesign } from "@expo/vector-icons";
 import { StyleSheet, Pressable } from "react-native";
 
 interface Props {
-  icon: any;
-  onPress: () => void;
-  label: string;
+  onPress?: () => any;
+  label?: string;
+  styling?: any;
+  children?: any;
 }
 
-export function RoundButton({ icon, onPress, label }: Props) {
+export function RoundButton({ onPress, label, styling, children }: Props) {
   return (
     <Pressable
       accessibilityLabel={label}
-      style={styles.roundButton}
+      style={[styles.roundButton, styling]}
       onPress={onPress}
     >
-      <AntDesign name={icon} size={24} color="black" />
+      {children}
     </Pressable>
   );
 }
