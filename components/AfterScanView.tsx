@@ -42,10 +42,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "blue",
   },
-  statusBarBottom: {
-    backgroundColor: "grey",
-    marginTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-  },
   closeBtn: {
     backgroundColor: "white",
     margin: 10,
