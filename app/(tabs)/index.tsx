@@ -1,10 +1,10 @@
 import { Image, StyleSheet, Alert } from "react-native";
 
 import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
+import ParallaxScrollView from "@/templates/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
-import { RoundButton } from "@/components/RoundButton";
+import { ThemedView } from "@/templates/ThemedView";
+import { CustomShapeButton } from "@/components/CustomShapeButton";
 import QrScanner from "@/components/QrScanner";
 import { useEffect, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
@@ -39,21 +39,23 @@ export default function HomeScreen() {
 
           <ThemedView style={styles.parentContainer}>
             <ThemedView style={styles.childContainer}>
-              <RoundButton
+              <CustomShapeButton
+                shape="round"
                 label="Scan QR Code"
                 onPress={() => setWasQrBtnPressed(true)}
               >
                 <AntDesign name="qrcode" size={24} color="black" />
-              </RoundButton>
+              </CustomShapeButton>
             </ThemedView>
 
             <ThemedView style={styles.childContainer}>
-              <RoundButton
+              <CustomShapeButton
+                shape="round"
                 label="Send directly to an ID"
                 onPress={() => Alert.alert("Send directly button pressed")}
               >
                 <AntDesign name="plus" size={24} color="black" />
-              </RoundButton>
+              </CustomShapeButton>
             </ThemedView>
           </ThemedView>
         </ParallaxScrollView>

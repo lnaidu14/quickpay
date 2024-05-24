@@ -1,16 +1,26 @@
 import { CameraView, Camera } from "expo-camera";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { RoundButton } from "@/components/RoundButton";
+import { CustomShapeButton } from "@/components/CustomShapeButton";
 import { AntDesign } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { AfterScanView } from "@/components/AfterScanView";
 
 interface Props {
   setWasExitCameraPressed: Dispatch<SetStateAction<boolean>>;
+  children?: any;
 }
 
-export default function QrScanner({ setWasExitCameraPressed }: Props) {
+const TempComponent = () => (
+  <>
+    <Text>Hello world!</Text>
+  </>
+);
+
+export default function QrScanner({
+  setWasExitCameraPressed,
+  children,
+}: Props) {
   console.log("Entering QrScanner");
   const [hasPermission, setHasPermission] = useState<any>(null);
   const [scanned, setScanned] = useState(false);
@@ -47,8 +57,8 @@ export default function QrScanner({ setWasExitCameraPressed }: Props) {
     <View style={styles.container}>
       {scanned && uri ? (
         <>
-          <AfterScanView>
-            <></>
+          <AfterScanView setScanned={setScanned} ScannedView={TempComponent}>
+            {children}
           </AfterScanView>
         </>
       ) : (
@@ -66,15 +76,20 @@ export default function QrScanner({ setWasExitCameraPressed }: Props) {
               <View
                 style={{ flex: 1, alignSelf: "flex-end", alignItems: "center" }}
               >
-                <RoundButton label="Exit" onPress={() => setScanned(false)}>
+                <CustomShapeButton
+                  shape="round"
+                  label="Exit"
+                  onPress={() => setScanned(false)}
+                >
                   <MaterialIcons name="refresh" size={24} color="black" />
-                </RoundButton>
+                </CustomShapeButton>
               </View>
             )}
             <View
               style={{ flex: 1, alignSelf: "flex-end", alignItems: "center" }}
             >
-              <RoundButton
+              <CustomShapeButton
+                shape="round"
                 label="Exit"
                 styling={{ backgroundColor: "red" }}
                 onPress={() => {
@@ -82,7 +97,7 @@ export default function QrScanner({ setWasExitCameraPressed }: Props) {
                 }}
               >
                 <AntDesign name="close" size={24} color="black" />
-              </RoundButton>
+              </CustomShapeButton>
             </View>
           </View>
         </>
