@@ -2,9 +2,6 @@ import { Dispatch, SetStateAction } from "react";
 import {
   SafeAreaView,
   View,
-  Alert,
-  TouchableOpacity,
-  Text,
   StyleSheet,
   Platform,
   StatusBar,

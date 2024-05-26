@@ -10,9 +10,13 @@ import { AntDesign } from "@expo/vector-icons";
 
 interface Props {
   setWasQrBtnPressed: Dispatch<SetStateAction<boolean>>;
+  setWasManualPaymentPressed: Dispatch<SetStateAction<boolean>>;
 }
 
-export function DefaultHomeView({ setWasQrBtnPressed }: Props) {
+export function DefaultHomeView({
+  setWasQrBtnPressed,
+  setWasManualPaymentPressed,
+}: Props) {
   return (
     <>
       <ParallaxScrollView
@@ -43,8 +47,8 @@ export function DefaultHomeView({ setWasQrBtnPressed }: Props) {
           <ThemedView style={styles.childContainer}>
             <CustomShapeButton
               shape="round"
-              label="Send directly to an ID"
-              onPress={() => Alert.alert("Send based on ID")}
+              label="Send manually"
+              onPress={() => setWasManualPaymentPressed(true)}
             >
               <AntDesign name="plus" size={24} color="black" />
             </CustomShapeButton>

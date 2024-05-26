@@ -9,6 +9,7 @@ import { QrScannerView } from "@/components/Views/QrScannerView";
 import { useEffect, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { DefaultHomeView } from "@/components/Views/DefaultHomeView";
+import { ManualPaymentView } from "@/components/Views/ManualPaymentView";
 
 export default function HomeScreen() {
   const [wasQrBtnPressed, setWasQrBtnPressed] = useState(false);
@@ -23,8 +24,19 @@ export default function HomeScreen() {
 
   if (wasQrBtnPressed && !wasExitCameraPressed) {
     return <QrScannerView setWasExitCameraPressed={setWasExitCameraPressed} />;
+  } else if (wasManualPaymentPressed) {
+    return (
+      <ManualPaymentView
+        setWasManualPaymentPressed={setWasManualPaymentPressed}
+      />
+    );
   } else {
-    return <DefaultHomeView setWasQrBtnPressed={setWasQrBtnPressed} />;
+    return (
+      <DefaultHomeView
+        setWasQrBtnPressed={setWasQrBtnPressed}
+        setWasManualPaymentPressed={setWasManualPaymentPressed}
+      />
+    );
   }
 }
 
