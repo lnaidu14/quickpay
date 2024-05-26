@@ -5,12 +5,14 @@ import ParallaxScrollView from "@/templates/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/templates/ThemedView";
 import { CustomShapeButton } from "@/components/CustomShapeButton";
-import QrScanner from "@/components/QrScanner";
+import { QrScannerView } from "@/components/Views/QrScannerView";
 import { useEffect, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
+import { DefaultHomeView } from "@/components/Views/DefaultHomeView";
 
 export default function HomeScreen() {
   const [wasQrBtnPressed, setWasQrBtnPressed] = useState(false);
+  const [wasManualPaymentPressed, setWasManualPaymentPressed] = useState(false);
   const [wasExitCameraPressed, setWasExitCameraPressed] = useState(false);
   useEffect(() => {
     if (wasExitCameraPressed) {
@@ -18,50 +20,12 @@ export default function HomeScreen() {
       setWasQrBtnPressed(false);
     }
   }, [wasExitCameraPressed]);
-  return (
-    <>
-      {wasQrBtnPressed && !wasExitCameraPressed ? (
-        <QrScanner setWasExitCameraPressed={setWasExitCameraPressed} />
-      ) : (
-        <ParallaxScrollView
-          headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-          headerImage={
-            <Image
-              source={require("@/assets/images/partial-react-logo.png")}
-              style={styles.reactLogo}
-            />
-          }
-        >
-          <ThemedView style={styles.titleContainer}>
-            <ThemedText type="title">Quickpay</ThemedText>
-            <HelloWave />
-          </ThemedView>
 
-          <ThemedView style={styles.parentContainer}>
-            <ThemedView style={styles.childContainer}>
-              <CustomShapeButton
-                shape="round"
-                label="Scan QR Code"
-                onPress={() => setWasQrBtnPressed(true)}
-              >
-                <AntDesign name="qrcode" size={24} color="black" />
-              </CustomShapeButton>
-            </ThemedView>
-
-            <ThemedView style={styles.childContainer}>
-              <CustomShapeButton
-                shape="round"
-                label="Send directly to an ID"
-                onPress={() => Alert.alert("Send directly button pressed")}
-              >
-                <AntDesign name="plus" size={24} color="black" />
-              </CustomShapeButton>
-            </ThemedView>
-          </ThemedView>
-        </ParallaxScrollView>
-      )}
-    </>
-  );
+  if (wasQrBtnPressed && !wasExitCameraPressed) {
+    return <QrScannerView setWasExitCameraPressed={setWasExitCameraPressed} />;
+  } else {
+    return <DefaultHomeView setWasQrBtnPressed={setWasQrBtnPressed} />;
+  }
 }
 
 const styles = StyleSheet.create({

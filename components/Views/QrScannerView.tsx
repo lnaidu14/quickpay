@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { CustomShapeButton } from "@/components/CustomShapeButton";
 import { AntDesign } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
-import { AfterScanView } from "@/components/AfterScanView";
+import { AfterScanView } from "@/components/Views/AfterScanView";
 
 interface Props {
   setWasExitCameraPressed: Dispatch<SetStateAction<boolean>>;
@@ -17,10 +17,7 @@ const TempComponent = () => (
   </>
 );
 
-export default function QrScanner({
-  setWasExitCameraPressed,
-  children,
-}: Props) {
+export function QrScannerView({ setWasExitCameraPressed, children }: Props) {
   console.log("Entering QrScanner");
   const [hasPermission, setHasPermission] = useState<any>(null);
   const [scanned, setScanned] = useState(false);
