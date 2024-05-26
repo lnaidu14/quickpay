@@ -20,7 +20,7 @@ interface Props {
 export function AfterScanView({ setScanned, ScannedView }: Props) {
   return (
     <>
-      <View>
+      <View style={styles.statusBarBottom}>
         <CustomShapeButton
           shape="roundedSquare"
           label="Exit"
@@ -45,5 +45,9 @@ const styles = StyleSheet.create({
   closeBtn: {
     backgroundColor: "white",
     margin: 10,
+  },
+  statusBarBottom: {
+    backgroundColor: "grey",
+    marginTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
 });
