@@ -4,12 +4,13 @@ import { Animated, StyleSheet, TextInput, View } from "react-native";
 interface Props {
   config?: any;
   lblText?: string;
+  value?: string;
+  onChange?: (value: string) => void;
 }
 
-export const FloatingInput = ({ config, lblText }: Props) => {
-  const [text, setText] = useState("");
+export const FloatingInput = ({ config, lblText, value, onChange }: Props) => {
   const floatingLabelAnimation = useRef(
-    new Animated.Value(text ? 1 : 0)
+    new Animated.Value(value ? 1 : 0)
   ).current;
 
   const handleFocus = () => {
@@ -23,7 +24,7 @@ export const FloatingInput = ({ config, lblText }: Props) => {
 
   const handleBlur = () => {
     // If the input is empty, animate the floating label back to its original position
-    if (!text) {
+    if (!value) {
       Animated.timing(floatingLabelAnimation, {
         toValue: 0,
         duration: 150,
@@ -51,8 +52,8 @@ export const FloatingInput = ({ config, lblText }: Props) => {
       </Animated.Text>
       <TextInput
         style={styles.input}
-        value={text}
-        onChangeText={(val) => setText(val)}
+        value={value}
+        onChangeText={onChange}
         onFocus={handleFocus}
         onBlur={handleBlur}
         {...config}

@@ -1,12 +1,10 @@
-import { Dispatch, SetStateAction, memo, useState } from "react";
+import { Dispatch, SetStateAction, memo, useEffect, useState } from "react";
 import {
   Platform,
   StatusBar,
   StyleSheet,
-  TextInput,
   Text,
   View,
-  Keyboard,
   ScrollView,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
@@ -19,18 +17,6 @@ type FormData = {
   amount: string;
 };
 
-const NumberLabel = memo(() => (
-  <Text style={styles.lblText} nativeID="numberLabel">
-    Enter payee ID or phone number
-  </Text>
-));
-
-const AmountLabel = memo(() => (
-  <Text style={styles.lblText} nativeID="amountLabel">
-    Enter amount to transfer
-  </Text>
-));
-
 interface Props {
   setWasManualPaymentPressed: Dispatch<SetStateAction<boolean>>;
 }
@@ -38,13 +24,13 @@ interface Props {
 export function ManualPaymentView({ setWasManualPaymentPressed }: Props) {
   //   const [number, onChangeNumber] = useState("");
   //   const [amount, onChangeAmount] = useState("");
-  const [isInputBlur, setIsInputBlur] = useState(false);
-  const [isInputFocus, setIsInputFocus] = useState(false);
 
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitSuccessful },
+    reset,
+    clearErrors,
   } = useForm<FormData>({
     defaultValues: {
       number: "",
@@ -52,17 +38,17 @@ export function ManualPaymentView({ setWasManualPaymentPressed }: Props) {
     },
   });
 
-  const onSubmit = (data) => console.log(data);
+  useEffect(() => {
+    reset();
+  }, [isSubmitSuccessful]);
 
-  const handleBlur = () => {
-    setIsInputFocus(false);
-    setIsInputBlur(true);
-    Keyboard.dismiss();
-  };
-
-  const handleFocus = () => {
-    setIsInputFocus(true);
-    setIsInputBlur(false);
+  const onSubmit = (data) => {
+    console.log("submitted");
+    console.log(data);
+    if (!errors) {
+      clearErrors();
+      console.log(data);
+    }
   };
 
   return (
@@ -87,58 +73,43 @@ export function ManualPaymentView({ setWasManualPaymentPressed }: Props) {
           }}
           render={({ field: { onChange, value } }) => (
             <>
-              {/* {isInputFocus ? <NumberLabel /> : <></>} */}
-              {/* <TextInput
-                style={styles.input}
-                placeholder={
-                  isInputFocus ? "" : "Enter payee ID or phone number"
-                }
-                onBlur={handleBlur}
-                onFocus={handleFocus}
-                onChangeText={onChange}
-                value={value}
-                keyboardType="numeric"
-                accessibilityLabelledBy="numberLabel"
-              /> */}
               <FloatingInput
                 lblText="Enter payee ID or phone number"
                 config={{ keyboardType: "numeric" }}
+                value={value}
+                onChange={onChange}
               />
             </>
           )}
           name="number"
         />
-        {errors.number && <Text>An ID or Phone number is required</Text>}
+        {errors.number && (
+          <Text style={styles.errText}>An ID or Phone number is required</Text>
+        )}
 
         <Controller
           control={control}
           rules={{
+            required: true,
             maxLength: 100,
             max: 10000,
+            minLength: 1,
           }}
           render={({ field: { onChange, value } }) => (
             <>
-              {/* {isInputFocus ? <AmountLabel /> : <></>} */}
-              {/* <TextInput
-                style={styles.input}
-                placeholder={isInputFocus ? "" : "Enter amount to transfer"}
-                accessibilityLabel="Enter ID or phone number of payee"
-                onBlur={handleBlur}
-                onFocus={handleFocus}
-                onChangeText={onChange}
-                value={value}
-                keyboardType="numeric"
-                accessibilityLabelledBy="amountLabel"
-              /> */}
               <FloatingInput
                 lblText="Enter amount to transfer"
                 config={{ keyboardType: "numeric" }}
+                value={value}
+                onChange={onChange}
               />
             </>
           )}
-          name="number"
+          name="amount"
         />
-        {errors.amount && <Text>An amount is required.</Text>}
+        {errors && errors.amount && (
+          <Text style={styles.errText}>An amount is required.</Text>
+        )}
 
         <CustomShapeButton
           styling={styles.submitBtn}
@@ -146,7 +117,7 @@ export function ManualPaymentView({ setWasManualPaymentPressed }: Props) {
           label="Scan QR Code"
           onPress={handleSubmit(onSubmit)}
         >
-          <Text style={styles.text}>Submit</Text>
+          <Text style={styles.submitBtnText}>Submit</Text>
         </CustomShapeButton>
       </ScrollView>
     </>
@@ -172,24 +143,24 @@ const styles = StyleSheet.create({
   submitBtn: {
     height: 50,
     width: 250,
-    margin: 12,
+    margin: 10,
     borderWidth: 1,
     borderRadius: 10,
     backgroundColor: "#145DA0",
   },
-  text: {
+  submitBtnText: {
     fontSize: 16,
     lineHeight: 21,
     fontWeight: "bold",
     letterSpacing: 0.25,
     color: "white",
   },
-  lblText: {
+  errText: {
     fontSize: 10,
     lineHeight: 15,
     fontWeight: "bold",
     letterSpacing: 0.25,
-    color: "black",
+    color: "red",
   },
   closeBtn: {
     backgroundColor: "white",
