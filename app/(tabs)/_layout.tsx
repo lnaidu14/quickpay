@@ -4,7 +4,8 @@ import React from "react";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
@@ -19,11 +20,10 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "home" : "home-outline"}
-              color={color}
-            />
+          tabBarIcon: () => (
+            <TabBarIcon>
+              <Entypo name="home" size={24} color="white" />
+            </TabBarIcon>
           ),
         }}
       />
@@ -31,11 +31,10 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: "Profile",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "code-slash" : "code-slash-outline"}
-              color={color}
-            />
+          tabBarIcon: () => (
+            <TabBarIcon>
+              <MaterialCommunityIcons name="account" size={24} color="white" />
+            </TabBarIcon>
           ),
         }}
       />
