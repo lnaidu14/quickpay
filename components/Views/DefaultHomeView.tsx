@@ -1,22 +1,14 @@
-import { Image, StyleSheet, Alert } from "react-native";
+import { Image, StyleSheet } from "react-native";
 
 import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/templates/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/templates/ThemedView";
 import { CustomShapeButton } from "@/components/CustomShapeButton";
-import { Dispatch, SetStateAction } from "react";
 import { AntDesign } from "@expo/vector-icons";
+import { router } from "expo-router";
 
-interface Props {
-  setWasQrBtnPressed: Dispatch<SetStateAction<boolean>>;
-  setWasManualPaymentPressed: Dispatch<SetStateAction<boolean>>;
-}
-
-export function DefaultHomeView({
-  setWasQrBtnPressed,
-  setWasManualPaymentPressed,
-}: Props) {
+export function DefaultHomeView() {
   return (
     <>
       <ParallaxScrollView
@@ -38,7 +30,7 @@ export function DefaultHomeView({
             <CustomShapeButton
               shape="round"
               label="Scan QR Code"
-              onPress={() => setWasQrBtnPressed(true)}
+              onPress={() => router.navigate("/scan")}
             >
               <AntDesign name="qrcode" size={24} color="black" />
             </CustomShapeButton>
@@ -48,7 +40,7 @@ export function DefaultHomeView({
             <CustomShapeButton
               shape="round"
               label="Send manually"
-              onPress={() => setWasManualPaymentPressed(true)}
+              onPress={() => router.navigate("/payments")}
             >
               <AntDesign name="plus" size={24} color="black" />
             </CustomShapeButton>

@@ -1,24 +1,16 @@
 import { CameraView, Camera } from "expo-camera";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { CustomShapeButton } from "@/components/CustomShapeButton";
 import { AntDesign } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
-import { AfterScanView } from "@/components/Views/AfterScanView";
+import { router } from "expo-router";
+import { PaymentView } from "@/components/Views/PaymentView";
 
 interface Props {
-  setWasExitCameraPressed: Dispatch<SetStateAction<boolean>>;
   children?: any;
 }
-
-const TempComponent = () => (
-  <>
-    <Text>Hello world!</Text>
-  </>
-);
-
-export function QrScannerView({ setWasExitCameraPressed, children }: Props) {
-  console.log("Entering QrScanner");
+export function QrScannerView({ children }: Props) {
   const [hasPermission, setHasPermission] = useState<any>(null);
   const [scanned, setScanned] = useState(false);
   const [uri, setUri] = useState({ uri: "" });
@@ -53,11 +45,7 @@ export function QrScannerView({ setWasExitCameraPressed, children }: Props) {
   return (
     <View style={styles.container}>
       {scanned && uri ? (
-        <>
-          <AfterScanView setScanned={setScanned} ScannedView={TempComponent}>
-            {children}
-          </AfterScanView>
-        </>
+        <PaymentView />
       ) : (
         <>
           <CameraView
@@ -89,9 +77,7 @@ export function QrScannerView({ setWasExitCameraPressed, children }: Props) {
                 shape="round"
                 label="Exit"
                 styling={{ backgroundColor: "red" }}
-                onPress={() => {
-                  setWasExitCameraPressed(true);
-                }}
+                onPress={() => router.navigate("/")}
               >
                 <AntDesign name="close" size={24} color="black" />
               </CustomShapeButton>
