@@ -76,10 +76,15 @@ export function QrScannerView({ children }: Props) {
               <CustomShapeButton
                 shape="round"
                 label="Exit"
-                styling={{ backgroundColor: "red" }}
+                styling={{
+                  backgroundColor: "red",
+                  width: 75,
+                  height: 75,
+                  borderRadius: 150,
+                }}
                 onPress={() => router.navigate("/")}
               >
-                <AntDesign name="close" size={24} color="black" />
+                <AntDesign name="close" size={50} color="black" />
               </CustomShapeButton>
             </View>
           </View>
