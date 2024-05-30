@@ -29,7 +29,7 @@ export const PostTransactionView = ({
       next: "Try again",
     },
   };
-  const condition = "f";
+  const condition = "s";
   return (
     <>
       <View style={styles.container}>
