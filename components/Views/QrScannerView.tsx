@@ -45,7 +45,7 @@ export function QrScannerView({ children }: Props) {
   return (
     <View style={styles.container}>
       {scanned && uri ? (
-        <PaymentView />
+        <PaymentView scanned />
       ) : (
         <>
           <CameraView
