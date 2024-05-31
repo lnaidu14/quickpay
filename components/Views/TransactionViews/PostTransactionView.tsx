@@ -9,14 +9,9 @@ import { Entypo } from "@expo/vector-icons";
 interface Props {
   amount: string;
   recipient: string;
-  isSubmitSuccessful: true;
 }
 
-export const PostTransactionView = ({
-  amount,
-  recipient,
-  isSubmitSuccessful,
-}: Props) => {
+export const PostTransactionView = ({ amount, recipient }: Props) => {
   const transactionEvents = {
     home: "Home",
     success: {
@@ -34,7 +29,7 @@ export const PostTransactionView = ({
     <>
       <View style={styles.container}>
         <Text
-          style={isSubmitSuccessful ? styles.successText : styles.failureText}
+          style={condition === "s" ? styles.successText : styles.failureText}
         >
           {condition === "s"
             ? transactionEvents.success.message
@@ -97,12 +92,16 @@ export const PostTransactionView = ({
         <CustomShapeButton
           styling={styles.continueBtn}
           shape="roundedSquare"
-          label={condition === "s" ? "Make another transaction" : "Try again"}
+          label={
+            condition === "s"
+              ? transactionEvents.success.next
+              : transactionEvents.failure.next
+          }
           onPress={() => router.push("/payments")}
         >
           <Text style={styles.continueBtnText}>
             {condition === "s"
-              ? transactionEvents.success.message
+              ? transactionEvents.success.next
               : transactionEvents.failure.next}
           </Text>
         </CustomShapeButton>
