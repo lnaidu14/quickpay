@@ -6,14 +6,17 @@ import { AntDesign } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { PaymentView } from "@/components/Views/PaymentView";
+import { ScannedData } from "@/types/Payments";
 
-interface Props {
-  children?: any;
-}
-export function QrScannerView({ children }: Props) {
+export function QrScannerView() {
   const [hasPermission, setHasPermission] = useState<any>(null);
   const [scanned, setScanned] = useState(false);
   const [uri, setUri] = useState({ uri: "" });
+  const [scannedData, setScannedData] = useState<ScannedData>({
+    id: "",
+    username: "",
+    ph: "",
+  });
 
   useEffect(() => {
     const getCameraPermissions = async () => {
@@ -24,13 +27,8 @@ export function QrScannerView({ children }: Props) {
     getCameraPermissions();
   }, []);
 
-  const handleBarCodeScanned = ({
-    type,
-    data,
-  }: {
-    type: any;
-    data: string;
-  }) => {
+  const handleBarCodeScanned = ({ data }: { type: any; data: string }) => {
+    setScannedData(JSON.parse(data));
     setScanned(true);
     setUri({ uri: data });
   };
@@ -45,7 +43,7 @@ export function QrScannerView({ children }: Props) {
   return (
     <View style={styles.container}>
       {scanned && uri ? (
-        <PaymentView scanned />
+        <PaymentView scanned scannedData={scannedData} />
       ) : (
         <>
           <CameraView

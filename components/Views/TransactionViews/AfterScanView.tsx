@@ -3,14 +3,10 @@ import { StyleSheet, Text, ScrollView } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { CustomShapeButton } from "@/components/CustomShapeButton";
 import { FloatingInput } from "@/components/FloatingInput";
-
-type FormData = {
-  recipient: string;
-  amount: string;
-};
+import { FormData, ScannedData } from "@/types/Payments";
 
 interface Props {
-  payeeDetails: { name: string; id: string };
+  payeeDetails: ScannedData;
   setTransaction: Dispatch<SetStateAction<FormData>>;
 }
 
@@ -30,7 +26,7 @@ export function AfterScanView({ payeeDetails, setTransaction }: Props) {
   const onSubmit = (data: FormData) => {
     if (!Object.keys(errors).length) {
       clearErrors();
-      setTransaction({ amount: data.amount, recipient: payeeDetails.name });
+      setTransaction({ amount: data.amount, recipient: payeeDetails.username });
     }
   };
   return (
@@ -38,7 +34,7 @@ export function AfterScanView({ payeeDetails, setTransaction }: Props) {
       <ScrollView contentContainerStyle={styles.parentContainer}>
         <Text>Sending money to:</Text>
         <Text>ID: {payeeDetails.id}</Text>
-        <Text>Name: {payeeDetails.name}</Text>
+        <Text>Name: {payeeDetails.username}</Text>
         <Controller
           control={control}
           rules={{

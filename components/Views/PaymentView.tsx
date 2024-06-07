@@ -2,17 +2,14 @@ import { useState } from "react";
 import { PostTransactionView } from "@/components/Views/TransactionViews/PostTransactionView";
 import { AfterScanView } from "./TransactionViews/AfterScanView";
 import { ManualPaymentView } from "./TransactionViews/ManualPaymentView";
-
-type FormData = {
-  recipient: string;
-  amount: string;
-};
+import { FormData, ScannedData } from "@/types/Payments";
 
 interface Props {
   scanned: boolean;
+  scannedData: ScannedData;
 }
 
-export function PaymentView({ scanned }: Props) {
+export function PaymentView({ scanned, scannedData }: Props) {
   const [transaction, setTransaction] = useState<FormData>({
     recipient: "",
     amount: "",
@@ -27,7 +24,7 @@ export function PaymentView({ scanned }: Props) {
         />
       ) : scanned ? (
         <AfterScanView
-          payeeDetails={{ id: "1234", name: "Lalit" }}
+          payeeDetails={scannedData}
           setTransaction={setTransaction}
         />
       ) : (
