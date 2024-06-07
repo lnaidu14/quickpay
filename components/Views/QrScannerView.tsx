@@ -11,7 +11,6 @@ import { ScannedData } from "@/types/Payments";
 export function QrScannerView() {
   const [hasPermission, setHasPermission] = useState<any>(null);
   const [scanned, setScanned] = useState(false);
-  const [uri, setUri] = useState({ uri: "" });
   const [scannedData, setScannedData] = useState<ScannedData>({
     id: "",
     username: "",
@@ -30,7 +29,6 @@ export function QrScannerView() {
   const handleBarCodeScanned = ({ data }: { type: any; data: string }) => {
     setScannedData(JSON.parse(data));
     setScanned(true);
-    setUri({ uri: data });
   };
 
   if (hasPermission === null) {
@@ -42,7 +40,7 @@ export function QrScannerView() {
 
   return (
     <View style={styles.container}>
-      {scanned && uri ? (
+      {scanned && scannedData ? (
         <PaymentView scanned scannedData={scannedData} />
       ) : (
         <>
