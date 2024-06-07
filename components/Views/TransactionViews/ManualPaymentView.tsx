@@ -3,11 +3,7 @@ import { StyleSheet, Text, ScrollView } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { CustomShapeButton } from "@/components/CustomShapeButton";
 import { FloatingInput } from "@/components/FloatingInput";
-
-type FormData = {
-  recipient: string;
-  amount: string;
-};
+import { FormData } from "@/types/Payments";
 
 interface Props {
   setTransaction: Dispatch<SetStateAction<FormData>>;
