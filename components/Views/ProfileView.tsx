@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Button, Text } from "react-native";
 
 import ParallaxScrollView from "@/templates/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
@@ -15,18 +15,31 @@ import Animated, {
   withRepeat,
   Easing,
 } from "react-native-reanimated";
+import { useAuth0 } from "react-native-auth0";
 
 export function ProfileView() {
+  const { clearSession, user, error } = useAuth0();
   const [qrImageString, setQrImageString] = useState("");
+
+  const onLogout = async () => {
+    try {
+      await clearSession();
+    } catch (e) {
+      console.log("Log out cancelled");
+    }
+  };
   const fetchQrCode = async () =>
     await axios
-      .get(
-        "http://192.168.2.36:3000/api/user/c85b4c8e-07ab-4c02-849d-71d495d6f905"
-      )
-      .then((response) => setQrImageString(response.data));
+      .post(`http://192.168.2.36:3000/api/user/${user?.sub}`, {
+        username: user?.nickname,
+        ph: user?.phoneNumber ?? "N/A",
+      })
+      .then((response) => {
+        setQrImageString(response.data);
+      });
 
   useEffect(() => {
-    fetchQrCode();
+    if (user) fetchQrCode();
   }, []);
   const rotation = useSharedValue(0);
 
@@ -41,11 +54,29 @@ export function ProfileView() {
       50
     )
   );
+
+  const loggedIn = user !== undefined && user !== null;
+
   return (
     <>
       <ParallaxScrollView>
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title">Profile</ThemedText>
+        </ThemedView>
+
+        <ThemedView style={styles.childContainer}>
+          <View style={styles.metadataContainer}>
+            {loggedIn && (
+              <>
+                <ThemedText>
+                  Hello {user.name}! {"\n"}
+                  Email: {user.email}
+                  {"\n"}
+                  Ph: {user.phoneNumber ?? "N/A"}
+                </ThemedText>
+              </>
+            )}
+          </View>
         </ThemedView>
 
         <ThemedView style={styles.childContainer}>
@@ -55,8 +86,8 @@ export function ProfileView() {
                 <Animated.Image
                   entering={FadeIn.duration(200)}
                   style={{
-                    width: 350,
-                    height: 350,
+                    width: 300,
+                    height: 300,
                     borderWidth: 1,
                   }}
                   source={{ uri: qrImageString }}
@@ -69,6 +100,12 @@ export function ProfileView() {
                 </Animated.View>
               </>
             )}
+          </View>
+        </ThemedView>
+        <ThemedView style={styles.childContainer}>
+          <View style={styles.logoutContainer}>
+            {error && <ThemedText>{error.message}</ThemedText>}
+            <Button onPress={onLogout} title="Logout" />
           </View>
         </ThemedView>
       </ParallaxScrollView>
@@ -89,7 +126,21 @@ const styles = StyleSheet.create({
     gap: 8,
     margin: 10,
   },
+  metadataContainer: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "purple",
+  },
   qrCodeContainer: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "purple",
+  },
+  logoutContainer: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "center",

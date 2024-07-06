@@ -6,8 +6,33 @@ import { ThemedView } from "@/templates/ThemedView";
 import { CustomShapeButton } from "@/components/CustomShapeButton";
 import { AntDesign } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useAuth0 } from "react-native-auth0";
 
 export function DefaultHomeView() {
+  const { authorize, user, isLoading } = useAuth0();
+
+  const onLogin = async () => {
+    try {
+      await authorize();
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const loggedIn = user !== undefined && user !== null;
+
+  if (isLoading) {
+    return (
+      <View style={styles.contentContainer}>
+        <ThemedText>Loading</ThemedText>
+      </View>
+    );
+  }
+
+  if (!loggedIn) {
+    onLogin();
+  }
+
   return (
     <>
       <ParallaxScrollView>

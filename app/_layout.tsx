@@ -8,6 +8,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
+import { Auth0Provider } from "react-native-auth0";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 
@@ -32,12 +33,17 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="payments" options={{ title: "Make a payment" }} />
-        <Stack.Screen name="scan" options={{ title: "Scan QR Code" }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
+      <Auth0Provider
+        domain={"dev-quickpay.us.auth0.com"}
+        clientId={"Z14PvMVMV9tgjEOzMSLJo6cC1eVG7Nfw"}
+      >
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="payments" options={{ title: "Make a payment" }} />
+          <Stack.Screen name="scan" options={{ title: "Scan QR Code" }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+      </Auth0Provider>
     </ThemeProvider>
   );
 }
