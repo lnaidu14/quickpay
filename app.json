@@ -38,6 +38,12 @@
         {
           "recordAudioAndroid": true
         }
+      ],
+      [
+        "react-native-auth0",
+        {
+          "domain": "dev-quickpay.us.auth0.com"
+        }
       ]
     ],
     "experiments": {
