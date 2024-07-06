@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import ParallaxScrollView from "@/templates/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
@@ -6,10 +6,10 @@ import { ThemedView } from "@/templates/ThemedView";
 import { CustomShapeButton } from "@/components/CustomShapeButton";
 import { AntDesign } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useAuth0, Auth0Provider } from "react-native-auth0";
+import { useAuth0 } from "react-native-auth0";
 
 export function DefaultHomeView() {
-  const { authorize, clearSession, user, error, isLoading } = useAuth0();
+  const { authorize, user, isLoading } = useAuth0();
 
   const onLogin = async () => {
     try {
@@ -19,37 +19,25 @@ export function DefaultHomeView() {
     }
   };
 
-  const onLogout = async () => {
-    try {
-      await clearSession();
-    } catch (e) {
-      console.log("Log out cancelled");
-    }
-  };
-
   const loggedIn = user !== undefined && user !== null;
+
+  if (isLoading) {
+    return (
+      <View style={styles.contentContainer}>
+        <ThemedText>Loading</ThemedText>
+      </View>
+    );
+  }
+
+  if (!loggedIn) {
+    onLogin();
+  }
 
   return (
     <>
       <ParallaxScrollView>
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title">Quickpay</ThemedText>
-        </ThemedView>
-
-        <ThemedView style={styles.childContainer}>
-          <View style={styles.manualPaymentContainer}>
-            {loggedIn && <Text>You are logged in as {user.name}</Text>}
-            {!loggedIn && <Text>You are not logged in</Text>}
-            {error && <Text>{error.message}</Text>}
-            <CustomShapeButton
-              shape="round"
-              label={loggedIn ? "Log Out" : "Log In"}
-              onPress={() => (loggedIn ? onLogout : onLogin)}
-              styling={{ width: 200, height: 200, borderRadius: 150 }}
-            >
-              <AntDesign name="login" size={100} color="black" />
-            </CustomShapeButton>
-          </View>
         </ThemedView>
 
         <ThemedView style={styles.contentContainer}>
