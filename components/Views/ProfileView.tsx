@@ -31,6 +31,7 @@ export function ProfileView() {
   const fetchQrCode = async () =>
     await axios
       .post(`http://192.168.2.36:3000/api/user/${user?.sub}`, {
+        id: user?.sub,
         username: user?.nickname,
         ph: user?.phoneNumber ?? "N/A",
       })

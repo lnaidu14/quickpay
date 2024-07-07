@@ -1,21 +1,18 @@
 import { CameraView, Camera } from "expo-camera";
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, ToastAndroid, View } from "react-native";
 import { CustomShapeButton } from "@/components/CustomShapeButton";
 import { AntDesign } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { PaymentView } from "@/components/Views/PaymentView";
 import { ScannedData } from "@/types/Payments";
+import axios from "axios";
 
 export function QrScannerView() {
   const [hasPermission, setHasPermission] = useState<any>(null);
   const [scanned, setScanned] = useState(false);
-  const [scannedData, setScannedData] = useState<ScannedData>({
-    id: "",
-    username: "",
-    ph: "",
-  });
+  const [scannedData, setScannedData] = useState<ScannedData | undefined>();
 
   useEffect(() => {
     const getCameraPermissions = async () => {
@@ -26,9 +23,24 @@ export function QrScannerView() {
     getCameraPermissions();
   }, []);
 
-  const handleBarCodeScanned = ({ data }: { type: any; data: string }) => {
-    setScannedData(JSON.parse(data));
+  const handleBarCodeScanned = async ({
+    data,
+  }: {
+    type: any;
+    data: string;
+  }) => {
     setScanned(true);
+    const barCodeData = JSON.parse(data);
+    const res = await axios
+      .get(`http://192.168.2.36:3000/api/users/${barCodeData.id}`)
+      .then((response) => response.data)
+      .catch((err) => err.response.data);
+
+    if (res.user_id === barCodeData.id && res.nickname === barCodeData.username)
+      setScannedData(barCodeData);
+    else if (res.statusCode === 400 || 404) {
+      ToastAndroid.show(res.message, ToastAndroid.SHORT);
+    }
   };
 
   if (hasPermission === null) {
@@ -37,7 +49,6 @@ export function QrScannerView() {
   if (hasPermission === false) {
     return <Text>No access to camera</Text>;
   }
-
   return (
     <View style={styles.container}>
       {scanned && scannedData ? (
@@ -50,7 +61,7 @@ export function QrScannerView() {
             barcodeScannerSettings={{
               barcodeTypes: ["qr", "pdf417"],
             }}
-            onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+            onBarcodeScanned={scanned ? () => {} : handleBarCodeScanned}
           />
           <View style={styles.buttonContainer}>
             {scanned && (
@@ -60,9 +71,14 @@ export function QrScannerView() {
                 <CustomShapeButton
                   shape="round"
                   label="Exit"
+                  styling={{
+                    width: 75,
+                    height: 75,
+                    borderRadius: 150,
+                  }}
                   onPress={() => setScanned(false)}
                 >
-                  <MaterialIcons name="refresh" size={24} color="black" />
+                  <MaterialIcons name="refresh" size={50} color="black" />
                 </CustomShapeButton>
               </View>
             )}
