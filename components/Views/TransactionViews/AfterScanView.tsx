@@ -33,8 +33,7 @@ export function AfterScanView({ payeeDetails, setTransaction }: Props) {
     <>
       <ScrollView contentContainerStyle={styles.parentContainer}>
         <Text>Sending money to:</Text>
-        <Text>ID: {payeeDetails.id}</Text>
-        <Text>Name: {payeeDetails.username}</Text>
+        <Text>Username: {payeeDetails.username}</Text>
         <Controller
           control={control}
           rules={{
