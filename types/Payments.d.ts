@@ -1,7 +1,7 @@
 export interface ScannedData {
-    id: string;
+    id?: string;
     username: string;
-    ph: string;
+    ph?: string;
 }
 
 export interface FormData {

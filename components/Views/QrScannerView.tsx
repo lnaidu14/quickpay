@@ -30,14 +30,14 @@ export function QrScannerView() {
     data: string;
   }) => {
     setScanned(true);
-    const barCodeData = JSON.parse(data);
+    const barCodeData = data;
     const res = await axios
-      .get(`http://192.168.2.36:3000/api/users/${barCodeData.id}`)
-      .then((response) => response.data)
+      .get(`http://192.168.2.36:3000/api/users/${barCodeData}`)
+      .then((response) => {
+        return { statusCode: response.status, data: response.data };
+      })
       .catch((err) => err.response.data);
-
-    if (res.user_id === barCodeData.id && res.nickname === barCodeData.username)
-      setScannedData(barCodeData);
+    if (res.statusCode === 200) setScannedData({ username: res.data.nickname });
     else if (res.statusCode === 400 || 404) {
       ToastAndroid.show(res.message, ToastAndroid.SHORT);
     }
@@ -52,7 +52,7 @@ export function QrScannerView() {
   return (
     <View style={styles.container}>
       {scanned && scannedData ? (
-        <PaymentView scanned scannedData={scannedData} />
+        <PaymentView scannedData={scannedData} />
       ) : (
         <>
           <CameraView

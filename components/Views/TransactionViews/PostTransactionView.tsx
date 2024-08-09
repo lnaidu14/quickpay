@@ -97,7 +97,7 @@ export const PostTransactionView = ({ amount, recipient }: Props) => {
               ? transactionEvents.success.next
               : transactionEvents.failure.next
           }
-          onPress={() => router.push("/payments")}
+          onPress={() => router.push("..")}
         >
           <Text style={styles.continueBtnText}>
             {condition === "s"
