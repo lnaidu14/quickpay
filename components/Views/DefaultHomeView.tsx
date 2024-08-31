@@ -5,34 +5,8 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/templates/ThemedView";
 import { CustomShapeButton } from "@/components/CustomShapeButton";
 import { AntDesign } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { useAuth0 } from "react-native-auth0";
 
-export function DefaultHomeView() {
-  const { authorize, user, isLoading } = useAuth0();
-
-  const onLogin = async () => {
-    try {
-      await authorize();
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const loggedIn = user !== undefined && user !== null;
-
-  if (isLoading) {
-    return (
-      <View style={styles.contentContainer}>
-        <ThemedText>Loading</ThemedText>
-      </View>
-    );
-  }
-
-  if (!loggedIn) {
-    onLogin();
-  }
-
+export function DefaultHomeView({ navigation }) {
   return (
     <>
       <ParallaxScrollView>
@@ -46,7 +20,7 @@ export function DefaultHomeView() {
               <CustomShapeButton
                 shape="round"
                 label="Scan QR Code"
-                onPress={() => router.navigate("/scan")}
+                onPress={() => navigation.navigate("ScanQrCode")}
                 styling={{ width: 200, height: 200, borderRadius: 150 }}
               >
                 <AntDesign name="qrcode" size={100} color="black" />
@@ -59,7 +33,9 @@ export function DefaultHomeView() {
               <CustomShapeButton
                 shape="round"
                 label="Send manually"
-                onPress={() => router.navigate("/payments")}
+                onPress={() =>
+                  navigation.navigate("PaymentScreen", { username: "" })
+                }
                 styling={{ width: 200, height: 200, borderRadius: 150 }}
               >
                 <AntDesign name="plus" size={100} color="black" />

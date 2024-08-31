@@ -3,15 +3,12 @@ import { AntDesign } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import Animated, { BounceIn } from "react-native-reanimated";
-import { router } from "expo-router";
 import { Entypo } from "@expo/vector-icons";
 
-interface Props {
-  amount: string;
-  recipient: string;
-}
-
-export const PostTransactionView = ({ amount, recipient }: Props) => {
+export const PostTransactionView = ({ route, navigation }) => {
+  console.log("route params post transaction view: ", route.params);
+  const amount = route.params.amount;
+  const recipient = route.params.recipient;
   const transactionEvents = {
     home: "Home",
     success: {
@@ -97,7 +94,9 @@ export const PostTransactionView = ({ amount, recipient }: Props) => {
               ? transactionEvents.success.next
               : transactionEvents.failure.next
           }
-          onPress={() => router.push("..")}
+          onPress={() =>
+            navigation.navigate("PaymentScreen", { username: recipient })
+          }
         >
           <Text style={styles.continueBtnText}>
             {condition === "s"
@@ -110,7 +109,7 @@ export const PostTransactionView = ({ amount, recipient }: Props) => {
           styling={styles.continueBtn}
           shape="roundedSquare"
           label="Return to home page"
-          onPress={() => router.navigate("/")}
+          onPress={() => navigation.navigate("Home")}
         >
           <Text style={styles.continueBtnText}>Home</Text>
         </CustomShapeButton>

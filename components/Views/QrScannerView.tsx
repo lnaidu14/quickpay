@@ -4,15 +4,11 @@ import { StyleSheet, Text, ToastAndroid, View } from "react-native";
 import { CustomShapeButton } from "@/components/CustomShapeButton";
 import { AntDesign } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { PaymentView } from "@/components/Views/PaymentView";
-import { ScannedData } from "@/types/Payments";
 import axios from "axios";
 
-export function QrScannerView() {
+export function QrScannerView({ navigation }) {
   const [hasPermission, setHasPermission] = useState<any>(null);
   const [scanned, setScanned] = useState(false);
-  const [scannedData, setScannedData] = useState<ScannedData | undefined>();
 
   useEffect(() => {
     const getCameraPermissions = async () => {
@@ -34,10 +30,14 @@ export function QrScannerView() {
     const res = await axios
       .get(`http://192.168.2.36:3000/api/users/${barCodeData}`)
       .then((response) => {
+        console.log("response.data: ", response.data);
         return { statusCode: response.status, data: response.data };
       })
       .catch((err) => err.response.data);
-    if (res.statusCode === 200) setScannedData({ username: res.data.nickname });
+    if (res.statusCode === 200)
+      navigation.navigate("PaymentScreen", {
+        username: res.data.nickname,
+      });
     else if (res.statusCode === 400 || 404) {
       ToastAndroid.show(res.message, ToastAndroid.SHORT);
     }
@@ -49,59 +49,52 @@ export function QrScannerView() {
   if (hasPermission === false) {
     return <Text>No access to camera</Text>;
   }
+
   return (
     <View style={styles.container}>
-      {scanned && scannedData ? (
-        <PaymentView scannedData={scannedData} />
-      ) : (
-        <>
-          <CameraView
-            style={StyleSheet.absoluteFillObject}
-            facing="back"
-            barcodeScannerSettings={{
-              barcodeTypes: ["qr", "pdf417"],
-            }}
-            onBarcodeScanned={scanned ? () => {} : handleBarCodeScanned}
-          />
-          <View style={styles.buttonContainer}>
-            {scanned && (
-              <View
-                style={{ flex: 1, alignSelf: "flex-end", alignItems: "center" }}
-              >
-                <CustomShapeButton
-                  shape="round"
-                  label="Exit"
-                  styling={{
-                    width: 75,
-                    height: 75,
-                    borderRadius: 150,
-                  }}
-                  onPress={() => setScanned(false)}
-                >
-                  <MaterialIcons name="refresh" size={50} color="black" />
-                </CustomShapeButton>
-              </View>
-            )}
-            <View
-              style={{ flex: 1, alignSelf: "flex-end", alignItems: "center" }}
+      <CameraView
+        style={StyleSheet.absoluteFillObject}
+        facing="back"
+        barcodeScannerSettings={{
+          barcodeTypes: ["qr", "pdf417"],
+        }}
+        onBarcodeScanned={scanned ? () => {} : handleBarCodeScanned}
+      />
+      <View style={styles.buttonContainer}>
+        {scanned && (
+          <View
+            style={{ flex: 1, alignSelf: "flex-end", alignItems: "center" }}
+          >
+            <CustomShapeButton
+              shape="round"
+              label="Exit"
+              styling={{
+                width: 75,
+                height: 75,
+                borderRadius: 150,
+              }}
+              onPress={() => setScanned(false)}
             >
-              <CustomShapeButton
-                shape="round"
-                label="Exit"
-                styling={{
-                  backgroundColor: "red",
-                  width: 75,
-                  height: 75,
-                  borderRadius: 150,
-                }}
-                onPress={() => router.navigate("/")}
-              >
-                <AntDesign name="close" size={50} color="black" />
-              </CustomShapeButton>
-            </View>
+              <MaterialIcons name="refresh" size={50} color="black" />
+            </CustomShapeButton>
           </View>
-        </>
-      )}
+        )}
+        <View style={{ flex: 1, alignSelf: "flex-end", alignItems: "center" }}>
+          <CustomShapeButton
+            shape="round"
+            label="Exit"
+            styling={{
+              backgroundColor: "red",
+              width: 75,
+              height: 75,
+              borderRadius: 150,
+            }}
+            onPress={() => navigation.navigate("Home")}
+          >
+            <AntDesign name="close" size={50} color="black" />
+          </CustomShapeButton>
+        </View>
+      </View>
     </View>
   );
 }

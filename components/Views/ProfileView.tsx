@@ -16,10 +16,14 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import { useAuth0 } from "react-native-auth0";
+import * as LocalAuthentication from "expo-local-authentication";
+import { CustomShapeButton } from "../CustomShapeButton";
 
-export function ProfileView() {
+export function ProfileView({ navigation }) {
   const { clearSession, user, error } = useAuth0();
   const [qrImageString, setQrImageString] = useState("");
+  const [balance, setBalance] = useState("0");
+  const [biometricsEnabled, setBiometricsEnabled] = useState(false);
 
   const onLogout = async () => {
     try {
@@ -28,6 +32,39 @@ export function ProfileView() {
       console.log("Log out cancelled");
     }
   };
+
+  const handleAuthentication = async () => {
+    LocalAuthentication.hasHardwareAsync();
+    LocalAuthentication.isEnrolledAsync().then((data) => {
+      setBiometricsEnabled(data);
+    });
+    // TOOD: Need to revisit biometric authentication flow
+    let auth;
+    if (biometricsEnabled) {
+      auth = LocalAuthentication.authenticateAsync().then(async (data) => {
+        return data.success;
+      });
+    }
+    return auth;
+  };
+
+  const fetchBalance = async () => {
+    try {
+      const auth = await handleAuthentication();
+      if (auth) {
+        await axios
+          .get(`http://192.168.2.36:3000/api/users/${user?.sub}/balance`)
+          .then((response) => {
+            setBalance(response.data);
+          });
+      } else {
+        setBalance("N/A");
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   const fetchQrCode = async () =>
     await axios
       .post(`http://192.168.2.36:3000/api/user/${user?.sub}`, {
@@ -42,6 +79,7 @@ export function ProfileView() {
   useEffect(() => {
     if (user) fetchQrCode();
   }, []);
+
   const rotation = useSharedValue(0);
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -61,18 +99,14 @@ export function ProfileView() {
   return (
     <>
       <ParallaxScrollView>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">Profile</ThemedText>
-        </ThemedView>
-
         <ThemedView style={styles.childContainer}>
           <View style={styles.metadataContainer}>
             {loggedIn && (
               <>
                 <ThemedText>
                   Hello {user.name}! {"\n"}
-                  Email: {user.email}
-                  {"\n"}
+                  Email: {user.email} {"\n"}
+                  Balance: {balance} {"\n"}
                   Ph: {user.phoneNumber ?? "N/A"}
                 </ThemedText>
               </>
@@ -103,7 +137,30 @@ export function ProfileView() {
             )}
           </View>
         </ThemedView>
+
         <ThemedView style={styles.childContainer}>
+          {/* Button to view user balances */}
+          <View style={styles.logoutContainer}>
+            {error && <ThemedText>{error.message}</ThemedText>}
+            <Button onPress={fetchBalance} title="View Balance" />
+          </View>
+
+          {/* Button to view user's last 10 transactions */}
+          <CustomShapeButton
+            styling={styles.submitBtn}
+            shape="roundedSquare"
+            label="Transactions"
+            onPress={async () => {
+              const auth = await handleAuthentication();
+              if (auth) {
+                navigation.navigate("User Transactions");
+              }
+            }}
+          >
+            <Text style={{ color: "white" }}>View TX</Text>
+          </CustomShapeButton>
+
+          {/* Button to logout */}
           <View style={styles.logoutContainer}>
             {error && <ThemedText>{error.message}</ThemedText>}
             <Button onPress={onLogout} title="Logout" />
@@ -147,5 +204,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "purple",
+  },
+  submitBtn: {
+    height: 50,
+    width: 250,
+    margin: 10,
+    borderWidth: 1,
+    borderRadius: 10,
+    backgroundColor: "#145DA0",
   },
 });

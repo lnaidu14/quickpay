@@ -5,16 +5,14 @@ import { CustomShapeButton } from "@/components/CustomShapeButton";
 import { FloatingInput } from "@/components/FloatingInput";
 import { FormData } from "@/types/Payments";
 
-interface Props {
-  setTransaction: Dispatch<SetStateAction<FormData>>;
-}
-
-export function ManualPaymentView({ setTransaction }: Props) {
+export function PaymentView({ route, navigation }) {
+  console.log("payment screen data: ", route.params);
   const {
     control,
     handleSubmit,
     formState: { errors },
     clearErrors,
+    reset,
   } = useForm<FormData>({
     defaultValues: {
       recipient: "",
@@ -23,36 +21,49 @@ export function ManualPaymentView({ setTransaction }: Props) {
   });
 
   const onSubmit = (data: FormData) => {
+    console.log("payment screen on submit: ", data);
     if (!Object.keys(errors).length) {
       clearErrors();
-      setTransaction({ amount: data.amount, recipient: data.recipient });
+      reset();
+      navigation.navigate("TransactionSummary", {
+        amount: data.amount,
+        recipient: data.recipient ? data.recipient : route.params.username,
+      });
     }
   };
 
   return (
     <>
       <ScrollView contentContainerStyle={styles.parentContainer}>
-        <Controller
-          control={control}
-          rules={{
-            required: true,
-            maxLength: 36,
-            minLength: 1,
-          }}
-          render={({ field: { onChange, value } }) => (
-            <>
-              <FloatingInput
-                lblText="Enter payee ID or phone number"
-                config={{ keyboardType: "numeric" }}
-                value={value}
-                onChange={onChange}
-              />
-            </>
-          )}
-          name="recipient"
-        />
-        {errors.recipient && (
-          <Text style={styles.errText}>An ID or Phone number is required</Text>
+        {route.params.username ? (
+          <>
+            <Text>Sending money to:</Text>
+            <Text>Username: {route.params.username}</Text>
+          </>
+        ) : (
+          <>
+            <Controller
+              control={control}
+              rules={{
+                required: true,
+                maxLength: 36,
+                minLength: 1,
+              }}
+              render={({ field: { onChange, value } }) => (
+                <>
+                  <FloatingInput
+                    lblText="Enter username"
+                    value={value}
+                    onChange={onChange}
+                  />
+                </>
+              )}
+              name="recipient"
+            />
+            {errors.recipient && (
+              <Text style={styles.errText}>A username is required</Text>
+            )}
+          </>
         )}
 
         <Controller
