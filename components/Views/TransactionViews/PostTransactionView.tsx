@@ -6,7 +6,6 @@ import Animated, { BounceIn } from "react-native-reanimated";
 import { Entypo } from "@expo/vector-icons";
 
 export const PostTransactionView = ({ route, navigation }) => {
-  console.log("route params post transaction view: ", route.params);
   const amount = route.params.amount;
   const recipient = route.params.recipient;
   const transactionEvents = {

@@ -1,12 +1,13 @@
-import { Dispatch, SetStateAction } from "react";
-import { StyleSheet, Text, ScrollView } from "react-native";
+import { StyleSheet, Text, ScrollView, ToastAndroid } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { CustomShapeButton } from "@/components/CustomShapeButton";
 import { FloatingInput } from "@/components/FloatingInput";
 import { FormData } from "@/types/Payments";
+import axios from "axios";
+import { useAuth0 } from "react-native-auth0";
 
 export function PaymentView({ route, navigation }) {
-  console.log("payment screen data: ", route.params);
+  const { user } = useAuth0();
   const {
     control,
     handleSubmit,
@@ -15,20 +16,40 @@ export function PaymentView({ route, navigation }) {
     reset,
   } = useForm<FormData>({
     defaultValues: {
-      recipient: "",
-      amount: "",
+      recipient: route.params.username,
+      amount: 0,
     },
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log("payment screen on submit: ", data);
-    if (!Object.keys(errors).length) {
-      clearErrors();
-      reset();
-      navigation.navigate("TransactionSummary", {
-        amount: data.amount,
-        recipient: data.recipient ? data.recipient : route.params.username,
-      });
+  const onSubmit = async (data: FormData) => {
+    if (!Object.keys(errors).length && route.params.userId && user) {
+      console.log("recipient details: ", route.params.userId);
+      console.log("sender details: ", user?.sub);
+      const res = await axios
+        .post(`http://192.168.2.36:3000/api/users/transactions`, {
+          amt: Number(data.amount),
+          recipientId: route.params.userId,
+          senderId: user.sub,
+        })
+        .then((response) => {
+          console.log("response: ", response);
+          console.log("response status: ", response.status);
+          return { statusCode: response.status, data: response.data };
+        })
+        .catch((err) => {
+          return { statusCode: err.response.status, data: err.response.data };
+        });
+      console.log("Res; ", res);
+      if (res.statusCode === 201) {
+        clearErrors();
+        reset();
+        navigation.navigate("TransactionSummary", {
+          amount: data.amount,
+          recipient: data.recipient ? data.recipient : route.params.username,
+        });
+      } else if (res.statusCode === 400 || 404) {
+        ToastAndroid.show(res.data.message, ToastAndroid.SHORT);
+      }
     }
   };
 

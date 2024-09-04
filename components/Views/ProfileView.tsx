@@ -65,9 +65,9 @@ export function ProfileView({ navigation }) {
     }
   };
 
-  const fetchQrCode = async () =>
+  const generateQrCode = async () =>
     await axios
-      .post(`http://192.168.2.36:3000/api/user/${user?.sub}`, {
+      .post(`http://192.168.2.36:3000/api/users/qr/${user?.sub}`, {
         id: user?.sub,
         username: user?.nickname,
         ph: user?.phoneNumber ?? "N/A",
@@ -77,7 +77,7 @@ export function ProfileView({ navigation }) {
       });
 
   useEffect(() => {
-    if (user) fetchQrCode();
+    if (user) generateQrCode();
   }, []);
 
   const rotation = useSharedValue(0);
@@ -153,7 +153,7 @@ export function ProfileView({ navigation }) {
             onPress={async () => {
               const auth = await handleAuthentication();
               if (auth) {
-                navigation.navigate("User Transactions");
+                navigation.navigate("UserTransactions", { userId: user?.sub });
               }
             }}
           >

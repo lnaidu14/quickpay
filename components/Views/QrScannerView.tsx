@@ -27,16 +27,18 @@ export function QrScannerView({ navigation }) {
   }) => {
     setScanned(true);
     const barCodeData = data;
+    console.log("barCodeData: ", barCodeData);
     const res = await axios
-      .get(`http://192.168.2.36:3000/api/users/${barCodeData}`)
+      .get(`http://192.168.2.36:3000/api/auth/users/${barCodeData}`)
       .then((response) => {
-        console.log("response.data: ", response.data);
+        console.log("handleBarCodeScanned(), response.data: ", response.data);
         return { statusCode: response.status, data: response.data };
       })
       .catch((err) => err.response.data);
     if (res.statusCode === 200)
       navigation.navigate("PaymentScreen", {
         username: res.data.nickname,
+        userId: res.data.user_id,
       });
     else if (res.statusCode === 400 || 404) {
       ToastAndroid.show(res.message, ToastAndroid.SHORT);

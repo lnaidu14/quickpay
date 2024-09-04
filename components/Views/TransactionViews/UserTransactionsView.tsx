@@ -13,13 +13,15 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 
-export function UserTransactionsView() {
+export function UserTransactionsView({ route }) {
   const [userTransactions, setUserTransactions] = useState<Transaction[]>();
   const [page, setPage] = useState<number>(0);
   const [numberOfItemsPerPageList] = useState([2, 3, 4]);
   const [itemsPerPage, onItemsPerPageChange] = useState(
     numberOfItemsPerPageList[0]
   );
+
+  const userId = route.params.userId;
 
   const rotation = useSharedValue(0);
 
@@ -38,12 +40,8 @@ export function UserTransactionsView() {
   const fetchUserTransactions = async () => {
     try {
       await axios
-        // .get(`http://192.168.2.36:3000/api/users/${user?.sub}/transactions`)
-        .get(
-          `http://192.168.2.36:3000/api/users/google-oauth2|103164798987606999611/transactions`
-        )
+        .get(`http://192.168.2.36:3000/api/users/${userId}/transactions`)
         .then((response) => {
-          console.log("response: ", response.data);
           setUserTransactions(response.data);
         });
     } catch (e) {
@@ -56,6 +54,7 @@ export function UserTransactionsView() {
       await fetchUserTransactions();
     })();
   }, []);
+  console.log("userTransactions: ", userTransactions);
   return (
     <>
       <ScrollView contentContainerStyle={styles.parentContainer}>
@@ -64,7 +63,7 @@ export function UserTransactionsView() {
         {userTransactions ? (
           <DataTable style={{ backgroundColor: "black", flex: 1 }}>
             <DataTable.Header>
-              <DataTable.Title>From/To</DataTable.Title>
+              <DataTable.Title>From</DataTable.Title>
               <DataTable.Title>Date of Transaction</DataTable.Title>
               <DataTable.Title numeric>Amount</DataTable.Title>
             </DataTable.Header>
@@ -76,7 +75,7 @@ export function UserTransactionsView() {
               )
               .map((utx) => (
                 <DataTable.Row key={utx.tx_id}>
-                  <DataTable.Cell>N/A</DataTable.Cell>
+                  <DataTable.Cell>{utx.sender_id}</DataTable.Cell>
                   <DataTable.Cell>
                     {utx.tx_datetime.split("T")[0]}
                   </DataTable.Cell>
